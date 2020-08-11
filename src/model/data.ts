@@ -1,10 +1,10 @@
-export interface PutData {
+export interface DataReading {
   sensorId: string
   time: number
   value: number
 }
 
-export const validatePutData = (body: any): body is PutData => {
+export const validatePutData = (body: any): body is DataReading => {
   return (
     typeof body !== 'undefined' &&
     typeof body.sensorId === 'string' &&

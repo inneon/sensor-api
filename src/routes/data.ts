@@ -1,5 +1,5 @@
 import express from 'express'
-import { validatePutData } from '../model/data'
+import { validatePutData } from '../model'
 
 const data = express()
 
