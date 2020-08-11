@@ -5,7 +5,7 @@ import https from 'https'
 const systemUnderTest = axios.create({
   httpAgent: new httpModule.Agent({ keepAlive: true }),
   httpsAgent: new https.Agent({ keepAlive: true }),
-  baseURL: process.env.SERVICE_HOST || 'http://localhost:3000',
+  baseURL: process.env.APP_HOST || 'http://localhost:3000',
   timeout: 5000,
 })
 
