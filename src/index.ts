@@ -1,11 +1,13 @@
-import Express from 'express'
+import express from 'express'
+import { internal, data } from './routes'
+import bodyParser from 'body-parser'
 
 const PORT = 3000
 
-const app = Express()
+const app = express()
 
-app.get('/internal/healthcheck', (_req, res) => {
-  res.status(200).send('success')
-})
+app.use(bodyParser.json())
+app.use('/internal', internal)
+app.use('/data', data)
 
 app.listen(PORT, () => console.log(`App listening on http://localhost:${PORT}`))
