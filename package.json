@@ -6,7 +6,13 @@
   "scripts": {
     "start": "npm run build:live",
     "build": "tsc -p .",
-    "build:live": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts"
+    "build:live": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
+    "lint": "npx prettier --write ."
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint"
+    }
   },
   "keywords": [
     "node",
@@ -17,6 +23,7 @@
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^14.0.27",
+    "husky": "^4.2.5",
     "nodemon": "^2.0.4",
     "prettier": "2.0.5",
     "ts-node": "^8.10.2",
