@@ -1,8 +1,7 @@
 {
   "name": "ts-template",
   "version": "1.0.0",
-  "description": "Boilerplate template for typescript and node",
-  "main": "index.js",
+  "description": "Take home sensor API exercise",
   "scripts": {
     "start": "npm run build:live",
     "build": "tsc -p .",
@@ -10,6 +9,7 @@
     "build:live": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
     "lint": "npx prettier --write .",
     "test": "jest",
+    "test:watch": "jest --watch",
     "test:integration": "jest --config jest.integration.config.js"
   },
   "husky": {
@@ -38,6 +38,8 @@
     "typescript": "^3.9.7"
   },
   "dependencies": {
+    "@types/uuid": "^8.3.0",
+    "body-parser": "^1.19.0",
     "express": "^4.17.1"
   }
 }
