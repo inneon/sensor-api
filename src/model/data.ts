@@ -10,6 +10,11 @@ export interface SensorHistoryRequest {
   until: number
 }
 
+export type SensorHistory = {
+  time: number
+  value: number
+}[]
+
 export const validatePutData = (body: any): body is DataReading => {
   return (
     !!body &&

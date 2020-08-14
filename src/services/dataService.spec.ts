@@ -1,14 +1,17 @@
 import DataService, { SaveStatus } from './dataService'
 import Persistance from '../persistence'
 
+const createService = (overrides: Partial<Persistance>) =>
+  new DataService({
+    store: () => Promise.resolve(),
+    exists: () => Promise.resolve(false),
+    retrieve: () => Promise.resolve([]),
+    ...overrides,
+  })
+
 describe('data service', () => {
   it('should save a data reading', async () => {
-    const mockPerisitance: Persistance = {
-      store: () => Promise.resolve(),
-      exists: () => Promise.resolve(false),
-    }
-
-    const dataService = new DataService(mockPerisitance)
+    const dataService = createService({})
     const actual = await dataService.save({
       sensorId: 'a',
       time: 1,
@@ -19,11 +22,9 @@ describe('data service', () => {
   })
 
   it('should not persist a reading that has already been logged', async () => {
-    const mockPerisitance: Persistance = {
-      store: () => Promise.resolve(),
+    const dataService = createService({
       exists: () => Promise.resolve(true),
-    }
-    const dataService = new DataService(mockPerisitance)
+    })
 
     const actual = await dataService.save({
       sensorId: 'a',
@@ -32,5 +33,37 @@ describe('data service', () => {
     })
 
     expect(actual).toEqual<SaveStatus>(SaveStatus.duplicate)
+  })
+
+  it('should retrieve data requested', async () => {
+    const dataService = createService({
+      retrieve: () =>
+        Promise.resolve([
+          { time: 4, value: 16 },
+          { time: 1, value: 10 },
+          { time: 2, value: 10 },
+          { time: 5, value: 14 },
+        ]),
+    })
+
+    const actual = await dataService.retrieve({
+      sensorId: 'a',
+      since: 1,
+      until: 5,
+    })
+
+    expect(actual).toEqual({
+      requested: {
+        sensorId: 'a',
+        since: 1,
+        until: 5,
+      },
+      data: [
+        { time: 1, value: 10 },
+        { time: 2, value: 10 },
+        { time: 4, value: 16 },
+        { time: 5, value: 14 },
+      ],
+    })
   })
 })

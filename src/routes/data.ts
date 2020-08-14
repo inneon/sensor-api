@@ -1,14 +1,14 @@
 import express from 'express'
 import { validatePutData } from '../model'
 import DataService, { SaveStatus } from '../services/dataService'
-// import InMemory from '../persistence/inMemory'
-import { RedisClient } from '../persistence'
+import InMemory from '../persistence/inMemory'
+// import { RedisClient } from '../persistence'
 import { validateGetData } from '../model/data'
 
 const data = express()
 
 // todo - put in startup section and ensure cleaned up
-const service = new DataService(new RedisClient())
+const service = new DataService(new InMemory())
 
 data.put('/', async (req, res) => {
   console.log(`Request on /data PUT: ${JSON.stringify(req.body)}`)

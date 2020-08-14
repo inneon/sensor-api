@@ -37,6 +37,10 @@ class RedisPersistance implements Persistance {
       throw err
     })
   }
+
+  public async retrieve() {
+    return []
+  }
 }
 
 export default RedisPersistance

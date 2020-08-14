@@ -22,7 +22,11 @@ class DataService {
   }
 
   public async retrieve(request: SensorHistoryRequest) {
-    return { hello: 'world' }
+    const data = await this.persistance.retrieve(request)
+    return {
+      requested: request,
+      data: data.sort((a, b) => a.time - b.time),
+    }
   }
 }
 
