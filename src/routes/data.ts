@@ -1,11 +1,12 @@
 import express from 'express'
 import { validatePutData } from '../model'
 import DataService, { SaveStatus } from '../services/dataService'
-import InMemory from '../persistence/inMemory'
+// import InMemory from '../persistence/inMemory'
+import { RedisClient } from '../persistence'
 
 const data = express()
 
-const service = new DataService(new InMemory())
+const service = new DataService(new RedisClient())
 
 data.put('/', async (req, res) => {
   console.log(`Request on /data PUT: ${JSON.stringify(req.body)}`)

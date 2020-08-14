@@ -8,7 +8,17 @@ services:
       target: service
     restart: always
     ports:
-      - 3001:3000
+      - '3001:3000'
+    depends_on:
+      - redis
+    environment:
+      - REDIS_URL=redis://redis:6379
+
+  redis:
+    image: redis
+    container_name: readings
+    ports:
+      - '6379:6379'
 
   # Tests
   # -----
