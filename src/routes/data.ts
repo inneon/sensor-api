@@ -1,14 +1,14 @@
 import express from 'express'
 import { validatePutData } from '../model'
 import DataService, { SaveStatus } from '../services/dataService'
-import InMemory from '../persistence/inMemory'
-// import { RedisClient } from '../persistence'
+// import InMemory from '../persistence/inMemory'
+import { RedisClient } from '../persistence'
 import { validateGetData } from '../model/data'
 
 const data = express()
 
 // todo - put in startup section and ensure cleaned up
-const service = new DataService(new InMemory())
+const service = new DataService(new RedisClient())
 
 data.put('/', async (req, res) => {
   console.log(`Request on /data PUT: ${JSON.stringify(req.body)}`)
@@ -17,11 +17,16 @@ data.put('/', async (req, res) => {
     return res.sendStatus(400)
   }
 
-  const result = await service.save(body)
+  try {
+    const result = await service.save(body)
 
-  if (result === SaveStatus.duplicate) return res.sendStatus(409)
+    if (result === SaveStatus.duplicate) return res.sendStatus(409)
 
-  return res.sendStatus(200)
+    return res.sendStatus(200)
+  } catch (err) {
+    console.log(err)
+    return res.sendStatus(500)
+  }
 })
 
 data.get('/', async (req, res) => {
@@ -31,12 +36,17 @@ data.get('/', async (req, res) => {
     return res.sendStatus(400)
   }
 
-  const result = await service.retrieve(body)
+  try {
+    const result = await service.retrieve(body)
 
-  return res
-    .status(200)
-    .header('content-type', 'application/json')
-    .send(JSON.stringify(result))
+    return res
+      .status(200)
+      .header('content-type', 'application/json')
+      .send(JSON.stringify(result))
+  } catch (err) {
+    console.log(err)
+    return res.sendStatus(500)
+  }
 })
 
 export default data
