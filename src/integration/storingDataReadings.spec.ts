@@ -39,4 +39,55 @@ describe('storing data reading', () => {
       expect(err.response.status).toEqual(409)
     }
   })
+
+  it('should be able to retrieve reading that have been added', async () => {
+    const sensorId = v4()
+    await systemUnderTest.put('/data', {
+      sensorId,
+      time: 1,
+      value: 111,
+    })
+    await systemUnderTest.put('/data', {
+      sensorId,
+      time: 2,
+      value: 222,
+    })
+    await systemUnderTest.put('/data', {
+      sensorId,
+      time: 3,
+      value: 333,
+    })
+    await systemUnderTest.put('/data', {
+      sensorId,
+      time: 5,
+      value: 555,
+    })
+    await systemUnderTest.put('/data', {
+      sensorId: 'another sensor',
+      time: 1,
+      value: 111,
+    })
+
+    const result = await systemUnderTest.get('/data', {
+      data: {
+        sensorId,
+        since: 1,
+        until: 3,
+      },
+    })
+
+    expect(result.status).toEqual(200)
+    expect(result.data).toEqual({
+      requested: {
+        sensorId,
+        since: 1,
+        until: 3,
+      },
+      data: [
+        { time: 1, value: 111 },
+        { time: 2, value: 222 },
+        { time: 3, value: 333 },
+      ],
+    })
+  })
 })
