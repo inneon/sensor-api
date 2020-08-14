@@ -1,5 +1,6 @@
 import { DataReading } from '../model'
 import Persistance from '../persistence'
+import { SensorHistoryRequest } from '../model/data'
 
 export enum SaveStatus {
   success,
@@ -18,6 +19,10 @@ class DataService {
 
     await this.persistance.store(reading)
     return SaveStatus.success
+  }
+
+  public async retrieve(request: SensorHistoryRequest) {
+    return { hello: 'world' }
   }
 }
 
