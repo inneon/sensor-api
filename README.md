@@ -17,5 +17,5 @@ npm start
 
 ### Testing
 
-`npm run test` - runs the unit tests
-`npm run test:acceptance` - runs the acceptance tests
+* `npm run test` - runs the unit tests
+* `npm run test:acceptance` - runs the acceptance tests (redis must be running before any integration tests - this is done with`docker-compose up redis`)
