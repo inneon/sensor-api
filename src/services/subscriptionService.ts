@@ -1,6 +1,7 @@
 import { AlertSubscription, DataReading } from '../model'
 import { EmailRequest } from './emailService'
 import { SmsRequest } from './smsService'
+import { SubscriptionPersistance } from '../persistence'
 
 interface AcceptsSubscriptions {
   addAlertSubscription(alertSubscription: AlertSubscription): Promise<void>
@@ -11,30 +12,41 @@ export interface AcceptsDataReadings {
 }
 
 class SubscriptionService implements AcceptsSubscriptions, AcceptsDataReadings {
-  private subscriptions: Record<string, AlertSubscription[]>
+  private subscriptions: Record<string, AlertSubscription[]> | undefined
+  private subscriptionPeristance: SubscriptionPersistance
   private emailCallback: EmailRequest
   private smsCallback: SmsRequest
 
   constructor(
-    initialSubscriptions: Record<string, AlertSubscription[]>,
+    subscriptionPeristance: SubscriptionPersistance,
     emailCallback: EmailRequest,
     smsCallback: SmsRequest,
   ) {
-    this.subscriptions = initialSubscriptions
+    this.subscriptionPeristance = subscriptionPeristance
     this.emailCallback = emailCallback
     this.smsCallback = smsCallback
   }
 
-  public async addAlertSubscription(alertSubscription: AlertSubscription) {
-    if (!this.subscriptions[alertSubscription.sensorId]) {
-      this.subscriptions[alertSubscription.sensorId] = []
+  private async getSubscriptions() {
+    if (!this.subscriptions) {
+      this.subscriptions = await this.subscriptionPeristance.initialSubscriptions()
     }
-    this.subscriptions[alertSubscription.sensorId].push(alertSubscription)
-    //todo persit this
+
+    return this.subscriptions
   }
 
-  public onDataReading({ sensorId, value, time }: DataReading) {
-    const subscriptionsForSensor = this.subscriptions[sensorId] ?? []
+  public async addAlertSubscription(alertSubscription: AlertSubscription) {
+    const subscriptions = await this.getSubscriptions()
+    if (!subscriptions[alertSubscription.sensorId]) {
+      subscriptions[alertSubscription.sensorId] = []
+    }
+    subscriptions[alertSubscription.sensorId].push(alertSubscription)
+    this.subscriptionPeristance.saveSubscriptions(subscriptions)
+  }
+
+  public async onDataReading({ sensorId, value, time }: DataReading) {
+    const subscriptions = await this.getSubscriptions()
+    const subscriptionsForSensor = subscriptions[sensorId] ?? []
     const alerts = subscriptionsForSensor.filter(
       ({ threshold, comparison }) =>
         (comparison === 'gte' && value >= threshold) ||

@@ -5,11 +5,12 @@ import emailService from './emailService'
 import smsService from './smsService'
 
 // todo - put in startup section and ensure cleaned up
+const redis = new RedisClient()
 export const subscriptionService = new SubscriptionService(
-  {},
+  redis,
   emailService,
   smsService,
 )
-export const service = new DataService(new RedisClient(), subscriptionService)
+export const service = new DataService(redis, subscriptionService)
 
 export { SaveStatus } from './dataService'

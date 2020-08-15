@@ -1,8 +1,8 @@
-import Persistance from './persistance'
+import { DataPersistance, SubscriptionPersistance } from './persistance'
 import { DataReading } from '../model'
 import { SensorHistoryRequest } from '../model/data'
 
-class InMemory implements Persistance {
+class InMemory implements DataPersistance, SubscriptionPersistance {
   private readings: Record<string, number> = {}
 
   private toKey(sensorId: string, time: number) {
@@ -38,6 +38,12 @@ class InMemory implements Persistance {
         value: this.readings[key],
       }))
   }
+
+  public async initialSubscriptions() {
+    return Promise.resolve({})
+  }
+
+  public async saveSubscriptions() {}
 }
 
 export default InMemory

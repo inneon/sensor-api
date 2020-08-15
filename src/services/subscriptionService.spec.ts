@@ -1,26 +1,30 @@
 import SubscriptionService from './subscriptionService'
 
 describe('subscription service', () => {
-  it('should email when a subscribed sensor goes over the threshold', () => {
+  it('should email when a subscribed sensor goes over the threshold', async () => {
     const mockEmail = jest.fn()
     const mockSms = jest.fn()
     const service = new SubscriptionService(
       {
-        sensor1: [
-          {
-            sensorId: 'sensor1',
-            threshold: 5,
-            comparison: 'gte',
-            type: 'email',
-            address: 'a@b.com',
-          },
-        ],
+        initialSubscriptions: () =>
+          Promise.resolve({
+            sensor1: [
+              {
+                sensorId: 'sensor1',
+                threshold: 5,
+                comparison: 'gte',
+                type: 'email',
+                address: 'a@b.com',
+              },
+            ],
+          }),
+        saveSubscriptions: () => Promise.resolve(),
       },
       mockEmail,
       mockSms,
     )
 
-    service.onDataReading({
+    await service.onDataReading({
       sensorId: 'sensor1',
       time: 2,
       value: 10,
@@ -36,26 +40,30 @@ describe('subscription service', () => {
     })
   })
 
-  it('should email when a subscribed sensor goes under the threshold', () => {
+  it('should email when a subscribed sensor goes under the threshold', async () => {
     const mockEmail = jest.fn()
     const mockSms = jest.fn()
     const service = new SubscriptionService(
       {
-        sensor1: [
-          {
-            sensorId: 'sensor1',
-            threshold: 5,
-            comparison: 'lte',
-            type: 'email',
-            address: 'a@b.com',
-          },
-        ],
+        initialSubscriptions: () =>
+          Promise.resolve({
+            sensor1: [
+              {
+                sensorId: 'sensor1',
+                threshold: 5,
+                comparison: 'lte',
+                type: 'email',
+                address: 'a@b.com',
+              },
+            ],
+          }),
+        saveSubscriptions: () => Promise.resolve(),
       },
       mockEmail,
       mockSms,
     )
 
-    service.onDataReading({
+    await service.onDataReading({
       sensorId: 'sensor1',
       time: 2,
       value: 2,
@@ -71,26 +79,30 @@ describe('subscription service', () => {
     })
   })
 
-  it('should not email when a subscribed sensor doesnt reach the threshold', () => {
+  it('should not email when a subscribed sensor doesnt reach the threshold', async () => {
     const mockEmail = jest.fn()
     const mockSms = jest.fn()
     const service = new SubscriptionService(
       {
-        sensor1: [
-          {
-            sensorId: 'sensor1',
-            threshold: 5,
-            comparison: 'gte',
-            type: 'email',
-            address: 'a@b.com',
-          },
-        ],
+        initialSubscriptions: () =>
+          Promise.resolve({
+            sensor1: [
+              {
+                sensorId: 'sensor1',
+                threshold: 5,
+                comparison: 'gte',
+                type: 'email',
+                address: 'a@b.com',
+              },
+            ],
+          }),
+        saveSubscriptions: () => Promise.resolve(),
       },
       mockEmail,
       mockSms,
     )
 
-    service.onDataReading({
+    await service.onDataReading({
       sensorId: 'sensor1',
       time: 2,
       value: 2,
@@ -99,35 +111,39 @@ describe('subscription service', () => {
     expect(mockEmail).not.toBeCalled()
   })
 
-  it('should email for the right sensor', () => {
+  it('should email for the right sensor', async () => {
     const mockEmail = jest.fn()
     const mockSms = jest.fn()
     const service = new SubscriptionService(
       {
-        sensor1: [
-          {
-            sensorId: 'sensor1',
-            threshold: 5,
-            comparison: 'lte',
-            type: 'email',
-            address: 'a@b.com',
-          },
-        ],
-        sensor2: [
-          {
-            sensorId: 'sensor2',
-            threshold: 5,
-            comparison: 'lte',
-            type: 'email',
-            address: 'a@b.com',
-          },
-        ],
+        initialSubscriptions: () =>
+          Promise.resolve({
+            sensor1: [
+              {
+                sensorId: 'sensor1',
+                threshold: 5,
+                comparison: 'lte',
+                type: 'email',
+                address: 'a@b.com',
+              },
+            ],
+            sensor2: [
+              {
+                sensorId: 'sensor2',
+                threshold: 5,
+                comparison: 'lte',
+                type: 'email',
+                address: 'a@b.com',
+              },
+            ],
+          }),
+        saveSubscriptions: () => Promise.resolve(),
       },
       mockEmail,
       mockSms,
     )
 
-    service.onDataReading({
+    await service.onDataReading({
       sensorId: 'sensor1',
       time: 2,
       value: 2,

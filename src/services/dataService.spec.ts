@@ -1,9 +1,9 @@
 import DataService, { SaveStatus } from './dataService'
-import Persistance from '../persistence'
+import { DataPersistance } from '../persistence'
 import { AcceptsDataReadings } from './subscriptionService'
 
 const createService = (
-  overrides: Partial<Persistance>,
+  overrides: Partial<DataPersistance>,
   acceptsDataReadings?: AcceptsDataReadings,
 ) =>
   new DataService(

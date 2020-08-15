@@ -1,5 +1,5 @@
 import { DataReading } from '../model'
-import Persistance from '../persistence'
+import { DataPersistance } from '../persistence'
 import { SensorHistoryRequest } from '../model/data'
 import { AcceptsDataReadings } from './subscriptionService'
 
@@ -9,10 +9,10 @@ export enum SaveStatus {
 }
 
 class DataService {
-  private persistance: Persistance
+  private persistance: DataPersistance
   private acceptsDataReadings: AcceptsDataReadings
   constructor(
-    persistance: Persistance,
+    persistance: DataPersistance,
     acceptsDataReadings: AcceptsDataReadings,
   ) {
     this.persistance = persistance
