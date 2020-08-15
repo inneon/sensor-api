@@ -1,17 +1,28 @@
 import { AlertSubscription, DataReading } from '../model'
 import { EmailRequest } from './emailService'
+import { SmsRequest } from './smsService'
 
-class SubscriptionService {
+interface AcceptsSubscriptions {
+  addAlertSubscription(alertSubscription: AlertSubscription): Promise<void>
+}
+
+export interface AcceptsDataReadings {
+  onDataReading(reading: DataReading): void
+}
+
+class SubscriptionService implements AcceptsSubscriptions, AcceptsDataReadings {
   private subscriptions: Record<string, AlertSubscription[]>
   private emailCallback: EmailRequest
+  private smsCallback: SmsRequest
 
   constructor(
     initialSubscriptions: Record<string, AlertSubscription[]>,
     emailCallback: EmailRequest,
+    smsCallback: SmsRequest,
   ) {
     this.subscriptions = initialSubscriptions
     this.emailCallback = emailCallback
-    console.log(this.subscriptions, initialSubscriptions)
+    this.smsCallback = smsCallback
   }
 
   public async addAlertSubscription(alertSubscription: AlertSubscription) {
@@ -23,7 +34,6 @@ class SubscriptionService {
   }
 
   public onDataReading({ sensorId, value, time }: DataReading) {
-    console.log(this.subscriptions)
     const subscriptionsForSensor = this.subscriptions[sensorId] ?? []
     const alerts = subscriptionsForSensor.filter(
       ({ threshold, comparison }) =>
@@ -40,6 +50,15 @@ class SubscriptionService {
           comparison: alert.comparison,
           time,
           emailAddress: alert.address,
+        })
+      } else if (alert.type === 'text') {
+        this.smsCallback({
+          sensorId,
+          value,
+          threshold: alert.threshold,
+          comparison: alert.comparison,
+          time,
+          phoneNumber: alert.phone,
         })
       }
     })

@@ -1,6 +1,7 @@
 import { DataReading } from '../model'
 import Persistance from '../persistence'
 import { SensorHistoryRequest } from '../model/data'
+import { AcceptsDataReadings } from './subscriptionService'
 
 export enum SaveStatus {
   success,
@@ -9,20 +10,20 @@ export enum SaveStatus {
 
 class DataService {
   private persistance: Persistance
-  private onDataReading: (dataReading: DataReading) => void
+  private acceptsDataReadings: AcceptsDataReadings
   constructor(
     persistance: Persistance,
-    onDataReading: (dataReading: DataReading) => void,
+    acceptsDataReadings: AcceptsDataReadings,
   ) {
     this.persistance = persistance
-    this.onDataReading = onDataReading
+    this.acceptsDataReadings = acceptsDataReadings
   }
 
   public async save(reading: DataReading) {
     if (await this.persistance.exists(reading.sensorId, reading.time))
       return SaveStatus.duplicate
 
-    this.onDataReading(reading)
+    this.acceptsDataReadings.onDataReading(reading)
     await this.persistance.store(reading)
     return SaveStatus.success
   }

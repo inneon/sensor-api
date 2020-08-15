@@ -3,6 +3,7 @@ import SubscriptionService from './subscriptionService'
 describe('subscription service', () => {
   it('should email when a subscribed sensor goes over the threshold', () => {
     const mockEmail = jest.fn()
+    const mockSms = jest.fn()
     const service = new SubscriptionService(
       {
         sensor1: [
@@ -16,6 +17,7 @@ describe('subscription service', () => {
         ],
       },
       mockEmail,
+      mockSms,
     )
 
     service.onDataReading({
@@ -36,6 +38,7 @@ describe('subscription service', () => {
 
   it('should email when a subscribed sensor goes under the threshold', () => {
     const mockEmail = jest.fn()
+    const mockSms = jest.fn()
     const service = new SubscriptionService(
       {
         sensor1: [
@@ -49,6 +52,7 @@ describe('subscription service', () => {
         ],
       },
       mockEmail,
+      mockSms,
     )
 
     service.onDataReading({
@@ -69,6 +73,7 @@ describe('subscription service', () => {
 
   it('should not email when a subscribed sensor doesnt reach the threshold', () => {
     const mockEmail = jest.fn()
+    const mockSms = jest.fn()
     const service = new SubscriptionService(
       {
         sensor1: [
@@ -82,6 +87,7 @@ describe('subscription service', () => {
         ],
       },
       mockEmail,
+      mockSms,
     )
 
     service.onDataReading({
@@ -95,6 +101,7 @@ describe('subscription service', () => {
 
   it('should email for the right sensor', () => {
     const mockEmail = jest.fn()
+    const mockSms = jest.fn()
     const service = new SubscriptionService(
       {
         sensor1: [
@@ -117,6 +124,7 @@ describe('subscription service', () => {
         ],
       },
       mockEmail,
+      mockSms,
     )
 
     service.onDataReading({
