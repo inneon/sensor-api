@@ -1,8 +1,10 @@
 import redis, { RedisClient } from 'redis'
 import { promisify } from 'util'
-import Persistance from './persistance'
-import { DataReading } from '../model'
+import { DataPersistance, SubscriptionPersistance } from './persistance'
+import { DataReading, AlertSubscription } from '../model'
 import { SensorHistoryRequest, SensorHistory } from '../model/data'
+
+const SUBSCRIPTION_KEY = 'subscriptions'
 
 export const toTimeAndValue = (zScores: string[]): SensorHistory => {
   return zScores
@@ -17,7 +19,7 @@ export const toTimeAndValue = (zScores: string[]): SensorHistory => {
     }, [])
 }
 
-class RedisPersistance implements Persistance {
+class RedisPersistance implements DataPersistance, SubscriptionPersistance {
   private client: RedisClient
   private existsKey: (key: string) => Promise<number>
   private zRangeByScore: (
@@ -26,14 +28,16 @@ class RedisPersistance implements Persistance {
     to: string | number,
     withScores: string,
   ) => Promise<unknown>
-  // private set: (key: string, value: string) => Promise<any>
+  private get: (key: string) => Promise<string | null>
+  private set: (key: string, value: string) => Promise<any>
 
   constructor() {
     this.client = redis.createClient(
       process.env.REDIS_URL || 'redis://localhost:6379',
     )
     this.existsKey = promisify(this.client.exists).bind(this.client)
-    // this.set = promisify(this.client.set).bind(this.client)
+    this.set = promisify(this.client.set).bind(this.client)
+    this.get = promisify(this.client.get).bind(this.client)
     this.zRangeByScore = promisify(this.client.zrangebyscore).bind(this.client)
   }
 
@@ -75,6 +79,20 @@ class RedisPersistance implements Persistance {
     )) as string[]
 
     return toTimeAndValue(result)
+  }
+
+  public async initialSubscriptions() {
+    const raw = await this.get(SUBSCRIPTION_KEY)
+    if (!raw) {
+      return {}
+    }
+    return JSON.parse(raw)
+  }
+
+  public async saveSubscriptions(
+    subscriptions: Record<string, AlertSubscription[]>,
+  ) {
+    await this.set(SUBSCRIPTION_KEY, JSON.stringify(subscriptions))
   }
 }
 

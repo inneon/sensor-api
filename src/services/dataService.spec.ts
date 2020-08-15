@@ -1,13 +1,20 @@
 import DataService, { SaveStatus } from './dataService'
-import Persistance from '../persistence'
+import { DataPersistance } from '../persistence'
+import { AcceptsDataReadings } from './subscriptionService'
 
-const createService = (overrides: Partial<Persistance>) =>
-  new DataService({
-    store: () => Promise.resolve(),
-    exists: () => Promise.resolve(false),
-    retrieve: () => Promise.resolve([]),
-    ...overrides,
-  })
+const createService = (
+  overrides: Partial<DataPersistance>,
+  acceptsDataReadings?: AcceptsDataReadings,
+) =>
+  new DataService(
+    {
+      store: () => Promise.resolve(),
+      exists: () => Promise.resolve(false),
+      retrieve: () => Promise.resolve([]),
+      ...overrides,
+    },
+    acceptsDataReadings ?? { onDataReading: () => {} },
+  )
 
 describe('data service', () => {
   it('should save a data reading', async () => {
@@ -65,5 +72,41 @@ describe('data service', () => {
         { time: 5, value: 14 },
       ],
     })
+  })
+
+  it('should call the subscription service when a reading is received', async () => {
+    const mockSubscriptionService = jest.fn()
+    const dataService = createService(
+      {},
+      { onDataReading: mockSubscriptionService },
+    )
+
+    await dataService.save({
+      sensorId: 'a',
+      time: 1,
+      value: 3,
+    })
+
+    expect(mockSubscriptionService).toBeCalledWith({
+      sensorId: 'a',
+      time: 1,
+      value: 3,
+    })
+  })
+
+  it('should not call the subscription service when a duplicate reading is received', async () => {
+    const mockSubscriptionService = jest.fn()
+    const dataService = createService(
+      { exists: () => Promise.resolve(true) },
+      { onDataReading: mockSubscriptionService },
+    )
+
+    await dataService.save({
+      sensorId: 'a',
+      time: 1,
+      value: 3,
+    })
+
+    expect(mockSubscriptionService).not.toBeCalled()
   })
 })
