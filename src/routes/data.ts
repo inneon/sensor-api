@@ -1,6 +1,6 @@
 import express from 'express'
 import { validatePutData, validateGetData } from '../model'
-import service, { SaveStatus } from '../services'
+import { service, SaveStatus } from '../services'
 
 const data = express()
 

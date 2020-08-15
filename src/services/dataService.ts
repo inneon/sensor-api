@@ -9,14 +9,20 @@ export enum SaveStatus {
 
 class DataService {
   private persistance: Persistance
-  constructor(persistance: Persistance) {
+  private onDataReading: (dataReading: DataReading) => void
+  constructor(
+    persistance: Persistance,
+    onDataReading: (dataReading: DataReading) => void,
+  ) {
     this.persistance = persistance
+    this.onDataReading = onDataReading
   }
 
   public async save(reading: DataReading) {
     if (await this.persistance.exists(reading.sensorId, reading.time))
       return SaveStatus.duplicate
 
+    this.onDataReading(reading)
     await this.persistance.store(reading)
     return SaveStatus.success
   }

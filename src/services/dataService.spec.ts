@@ -1,13 +1,20 @@
 import DataService, { SaveStatus } from './dataService'
 import Persistance from '../persistence'
+import { DataReading } from '../model'
 
-const createService = (overrides: Partial<Persistance>) =>
-  new DataService({
-    store: () => Promise.resolve(),
-    exists: () => Promise.resolve(false),
-    retrieve: () => Promise.resolve([]),
-    ...overrides,
-  })
+const createService = (
+  overrides: Partial<Persistance>,
+  onDataReading?: (dataReading: DataReading) => void,
+) =>
+  new DataService(
+    {
+      store: () => Promise.resolve(),
+      exists: () => Promise.resolve(false),
+      retrieve: () => Promise.resolve([]),
+      ...overrides,
+    },
+    onDataReading ?? (() => {}),
+  )
 
 describe('data service', () => {
   it('should save a data reading', async () => {

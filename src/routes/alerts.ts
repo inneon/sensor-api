@@ -1,5 +1,6 @@
 import express from 'express'
 import { validateAlertSubscription } from '../model'
+import { subscriptionService } from '../services'
 
 const alerts = express()
 
@@ -11,6 +12,7 @@ alerts.put('/', (req, res) => {
   }
 
   try {
+    subscriptionService.addAlertSubscription(body)
     res.sendStatus(200)
   } catch (err) {
     console.log(err)
