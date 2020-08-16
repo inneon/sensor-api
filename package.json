@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Take home sensor API exercise",
   "scripts": {
-    "start": "npm run build:live",
+    "start": "docker-compose up -d redis && npm run build:live",
     "build": "tsc -p .",
     "prod": "node lib/index.js",
     "build:live": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
