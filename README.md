@@ -13,6 +13,8 @@ npm i
 npm start
 ```
 
+This starts the app on `localhost:3000`. See below for endpoints.
+
 ## Other commands
 
 ### Testing
