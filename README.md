@@ -1,6 +1,6 @@
 # sensor-api
 
-Excercise for the take home software engineering interview for Jonny Wright.
+Exercise for the take home software engineering interview for Jonny Wright.
 
 ## Pre-requisites
 
